@@ -49,7 +49,7 @@ export default function Hero() {
       const sampleLogo = async () => {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = "/logo-mono.svg";
+        img.src = "./logo-mono.svg";
 
         await new Promise<void>((resolve, reject) => {
           img.onload = () => resolve();
