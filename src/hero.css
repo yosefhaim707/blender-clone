@@ -1,0 +1,147 @@
+@font-face {
+  font-family: "Mona Sans";
+  src: url("https://assets.codepen.io/64/Mona-Sans.woff2") format("woff2 supports variations"),
+       url("https://assets.codepen.io/64/Mona-Sans.woff2") format("woff2-variations");
+  font-weight: 100 1000;
+}
+
+@property --hue { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --rotate { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --bg-y { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --bg-x { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --glow-translate-y { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --bg-size { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --glow-opacity { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --glow-blur { syntax: "<number>"; inherits: true; initial-value: 6; }
+@property --glow-scale { syntax: "<number>"; inherits: true; initial-value: 1.5; }
+@property --glow-radius { syntax: "<number>"; inherits: true; initial-value: 100; }
+@property --white-shadow { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ring-angle { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ring-pad { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --ring-blur { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ring-opacity { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ring-sweep { syntax: "<number>"; inherits: true; initial-value: 30; }
+
+.glow-card {
+  --card-color: rgba(8, 8, 12, 0.65);
+  --text-color: rgba(255,255,255,0.92);
+  --card-radius: 28px;
+  --border-width: 3px;
+  --hue: 0;
+  --hue-speed: 1;
+  --rotate: 0;
+  --animation-speed: 4s;
+  --interaction-speed: 0.55s;
+  --glow-scale: 1.5;
+  --scale-factor: 1;
+  --glow-blur: 6;
+  --glow-opacity: 0.8;
+  --glow-radius: 100;
+  --glow-rotate-unit: 1deg;
+
+  position: relative;
+  border-radius: var(--card-radius);
+  overflow: hidden; /* keep glow inside card */
+  isolation: isolate; /* contain mix-blend effects */
+}
+
+.glow-card > .card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: rgba(16, 16, 20, 0.22);
+  border-radius: calc(var(--card-radius) * 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  padding: 1.25rem 1.25rem 2rem;
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.glow-card > .card-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 140% at 50% 10%, rgba(255,255,255,0.06), rgba(0,0,0,0.0) 60%);
+  pointer-events: none;
+}
+
+.glow-card .glow, .glow-card .glow::after { display: none; }
+
+/* border-only glow ring on hover */
+
+.glow-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: calc(var(--ring-pad) * 1px); /* base ring thickness */
+  /* ring that grows from one side: colored arc followed by transparent */
+  background: conic-gradient(
+    from calc(var(--ring-angle) * 1deg),
+    rgba(123,97,255,0.95) 0deg,
+    rgba(77,224,255,0.95) calc(var(--ring-sweep) * 0.33deg),
+    rgba(77,241,143,0.95) calc(var(--ring-sweep) * 0.66deg),
+    rgba(77,241,143,0.95) calc(var(--ring-sweep) * 1deg),
+    transparent calc(var(--ring-sweep) * 1deg)
+  );
+  /* Clip the gradient to the border only */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: blur(calc(var(--ring-blur) * 1px));
+  opacity: var(--ring-opacity);
+  transition: opacity 420ms cubic-bezier(.22,.61,.36,1), filter 520ms ease, padding 380ms ease, --ring-sweep 1400ms cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, filter, padding;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.glow-card:hover::after {
+  animation: ring-rotate 12s linear infinite, ring-breathe 5.5s ease-in-out infinite;
+  --ring-sweep: 360; /* sweep around smoothly */
+}
+
+@keyframes ring-rotate {
+  0% { --ring-angle: 0; }
+  100% { --ring-angle: 360; }
+}
+
+@keyframes ring-breathe {
+  0%, 100% { --ring-pad: 1; --ring-blur: 6; --ring-opacity: 0.65; }
+  50% { --ring-pad: 3; --ring-blur: 12; --ring-opacity: 1; }
+}
+
+.glow-card:hover > .card-inner::before { --bg-size: 15; animation-play-state: paused; }
+.glow-card:hover .glow { --glow-blur: 1.5; --glow-opacity: 0.6; --glow-scale: 2.5; --glow-radius: 0; --rotate: 900; --glow-rotate-unit: 0; --scale-factor: 1.25; animation-play-state: paused; }
+.glow-card:hover .glow::after { --glow-translate-y: 0; animation-play-state: paused; }
+
+@keyframes rotate-bg {
+  0% { --bg-x: 0; --bg-y: 0; }
+  25% { --bg-x: 100; --bg-y: 0; }
+  50% { --bg-x: 100; --bg-y: 100; }
+  75% { --bg-x: 0; --bg-y: 100; }
+  100% { --bg-x: 0; --bg-y: 0; }
+}
+
+@keyframes rotate {
+  from { --rotate: -70; --glow-translate-y: -65; }
+  25% { --glow-translate-y: -65; }
+  50% { --glow-translate-y: -65; }
+  60%, 75% { --glow-translate-y: -65; }
+  85% { --glow-translate-y: -65; }
+  to { --rotate: calc(360 - 70); --glow-translate-y: -65; }
+}
+
+@keyframes hue-animation { 0% { --hue: 0; } 100% { --hue: 360; } }
+
+/* Removed neon-card styles (green line) in favor of original animated glow-card */
+
+
